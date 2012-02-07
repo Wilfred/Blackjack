@@ -1,7 +1,7 @@
 import System.Random
 
 data Card = Ace | Two | Three | Four | Five | Six | Seven | Eight | Nine |
-            Ten | Jack | Queen | King deriving Show
+            Ten | Jack | Queen | King deriving (Show, Eq)
 type Hand = [Card]
 
 dealOneCard :: [Card] -> IO Card
@@ -21,6 +21,13 @@ cardValues Seven = [7]
 cardValues Eight = [8]
 cardValues Nine = [9]
 cardValues _ = [10]
+
+-- blackjack is a hand of two cards, an ace and a ten/picture card
+handIsBlackjack :: Hand -> Bool
+handIsBlackjack [card1, card2] =
+  ((card1 == Ace) && (elem card2 [Ten, Jack, Queen, King])) ||
+  ((card2 == Ace) && (elem card1 [Ten, Jack, Queen, King]))
+handIsBlackjack _ = False
 
 -- work out the possible scores this hand could have. No concerns have
 -- been given to efficiency here.
