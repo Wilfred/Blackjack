@@ -37,3 +37,11 @@ possibleHandTotals [] totals = sort $ nub totals
 possibleHandTotals (card:cards) runningTotals =
   possibleHandTotals cards newTotals
   where newTotals = [total + value | total <- runningTotals, value <- cardValues card]
+
+data Score x = Value Int | Blackjack | Bust deriving Show
+
+handScore :: Hand -> Score Int
+handScore hand =
+  if notBustTotals == [] then Bust else
+    if handIsBlackjack hand then Blackjack else Value (last notBustTotals)
+  where notBustTotals = filter (<= 21) $ possibleHandTotals hand [0]
