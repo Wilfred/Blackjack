@@ -1,4 +1,5 @@
 import System.Random
+import Data.List
 
 data Card = Ace | Two | Three | Four | Five | Six | Seven | Eight | Nine |
             Ten | Jack | Queen | King deriving (Show, Eq)
