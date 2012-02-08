@@ -1,6 +1,8 @@
 import System.Random
 import Data.List
 
+-- a blackjack simulator to measure effectiveness of tactics
+
 data Card = Ace | Two | Three | Four | Five | Six | Seven | Eight | Nine |
             Ten | Jack | Queen | King deriving (Show, Eq)
 type Hand = [Card]
