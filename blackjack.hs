@@ -51,12 +51,13 @@ handScore hand =
     if handIsBlackjack hand then Blackjack else Value (last notBustTotals)
   where notBustTotals = filter (<= 21) $ possibleHandTotals hand [0]
 
-data Move = Hit | Stick deriving Show
+-- todo: DoubleDown, Split
+data Move = Hit | Stand deriving Show
 
 -- in Las Vegas, dealer hits on soft 17
 dealerNextMove :: Hand -> Move
 dealerNextMove hand
   | score < Value 17 = Hit
-  | score == Value 17 = if handIsSoft hand then Hit else Stick
-  | otherwise = Stick
+  | score == Value 17 = if handIsSoft hand then Hit else Stand
+  | otherwise = Stand
   where score = handScore hand
