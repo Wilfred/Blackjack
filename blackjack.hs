@@ -41,10 +41,20 @@ possibleHandTotals (card:cards) runningTotals =
   possibleHandTotals cards newTotals
   where newTotals = [total + value | total <- runningTotals, value <- cardValues card]
 
-data Score x = Value Int | Blackjack | Bust deriving Show
+data Score x = Value Int | Blackjack | Bust deriving (Show, Ord, Eq)
 
 handScore :: Hand -> Score Int
 handScore hand =
   if notBustTotals == [] then Bust else
     if handIsBlackjack hand then Blackjack else Value (last notBustTotals)
   where notBustTotals = filter (<= 21) $ possibleHandTotals hand [0]
+
+data Move = Hit | Stick deriving Show
+
+-- in Las Vegas, dealer hits on soft 17
+dealerNextMove :: Hand -> Move
+dealerNextMove hand
+  | score < Value 17 = Hit
+  | score == Value 17 = if handIsSoft hand then Hit else Stick
+  | otherwise = Stick
+  where score = handScore hand
