@@ -30,6 +30,9 @@ handIsBlackjack [card1, card2] =
   ((card2 == Ace) && (elem card1 [Ten, Jack, Queen, King]))
 handIsBlackjack _ = False
 
+handIsSoft :: Hand -> Bool
+handIsSoft hand = Ace `elem` hand
+
 -- work out the possible scores this hand could have. No concerns have
 -- been given to efficiency here.
 possibleHandTotals :: Hand -> [Int] -> [Int]
