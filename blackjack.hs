@@ -4,15 +4,26 @@ import Data.List
 -- a blackjack simulator to measure effectiveness of tactics
 
 data Card = Ace | Two | Three | Four | Five | Six | Seven | Eight | Nine |
-            Ten | Jack | Queen | King deriving (Show, Eq)
+            Ten | Jack | Queen | King deriving (Show, Eq, Enum)
 type Hand = [Card]
+type Deck = [Card]
 
-dealOneCard :: [Card] -> IO Card
-dealOneCard [] = error "No cards left in deck"
-dealOneCard deck = do
-  randomCardIndex <- randomRIO (0, length deck - 1)
-  return (deck !! randomCardIndex)
+fullDeck :: Deck
+fullDeck = [Ace .. King] ++ [Ace .. King] ++ [Ace .. King] ++ [Ace .. King]
+
+shuffleCards :: Deck -> Deck -> IO Deck
+shuffleCards shuffled [] = return shuffled
+shuffleCards shuffled unshuffled = do
+  randomCardIndex <- randomRIO (0, length unshuffled - 1)
+  let randomCard = unshuffled !! randomCardIndex
+      unshuffledBefore = take randomCardIndex unshuffled
+      unshuffledAfter = drop (randomCardIndex + 1) unshuffled
   
+  shuffleCards (randomCard:shuffled) (unshuffledBefore ++ unshuffledAfter)
+
+shuffleDeck :: IO Deck
+shuffleDeck = shuffleCards [] fullDeck
+
 cardValues :: Card -> [Int]
 cardValues Ace = [1, 11]
 cardValues Two = [2]
