@@ -98,3 +98,13 @@ playBlackjack playerHand dealerHand (deck@card:cards)
         dealerScore = handScore dealerHand
         playerMove = playerNextMove playerHand
         dealerMove = dealerNextMove dealerHand
+
+-- play a game with the current strategy
+play :: IO Outcome
+play = do
+  shuffledDeck <- shuffleDeck
+  -- we don't deal cards in an alternating order, but it makes no difference
+  let playerHand = take 2 shuffledDeck
+      dealerHand = take 2 $ drop 2 shuffledDeck
+      remainingDeck = drop 4 shuffledDeck
+  return $ playBlackjack playerHand dealerHand remainingDeck
