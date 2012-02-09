@@ -72,3 +72,6 @@ dealerNextMove hand
   | score == Value 17 = if handIsSoft hand then Hit else Stand
   | otherwise = Stand
   where score = handScore hand
+
+-- very simple player for the time being
+playerNextMove = dealerNextMove
