@@ -78,7 +78,15 @@ playerNextMove = dealerNextMove
 
 -- since the money gained from winning with a blackjack hand is
 -- different, we use two wins
-data Outcome = Loss | Push | Win | BlackjackWin deriving Show
+data Outcome = Loss | Push | Win | BlackjackWin deriving (Show, Eq)
+
+-- calculate the money made in this hand
+moneyMade :: Integer -> Outcome -> Integer
+moneyMade bet outcome
+  | outcome == Loss = -1 * bet
+  | outcome == Push = 0
+  | outcome == Win = bet
+  | outcome == BlackjackWin = ceiling $ 1.5 * fromIntegral bet
 
 playBlackjack :: Hand -> Hand -> Deck -> Outcome
 playBlackjack playerHand dealerHand (deck@card:cards)
