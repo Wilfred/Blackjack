@@ -108,8 +108,8 @@ playBlackjack playerHand dealerHand (deck@card:cards)
         dealerMove = dealerNextMove dealerHand
 
 -- play a game with the current strategy
-play :: IO Outcome
-play = do
+playRound :: IO Outcome
+playRound = do
   shuffledDeck <- shuffleDeck
   -- we don't deal cards in an alternating order, but it makes no difference
   let playerHand = take 2 shuffledDeck
