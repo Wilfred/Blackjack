@@ -116,3 +116,16 @@ playRound = do
       dealerHand = take 2 $ drop 2 shuffledDeck
       remainingDeck = drop 4 shuffledDeck
   return $ playBlackjack playerHand dealerHand remainingDeck
+
+-- play a game N times and work out the overall takings/losses
+play :: Integer -> Integer -> IO Integer
+play 0 bet = return 0
+play count bet = do
+  -- get total for this round
+  outcome <- playRound
+  let roundTakings = moneyMade bet outcome
+      
+  -- recursively add up other rounds
+  remainingTakings <- play (count - 1) bet
+  
+  return $ roundTakings + remainingTakings
