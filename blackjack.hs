@@ -1,5 +1,6 @@
 import System.Random
 import Data.List
+import Text.Printf
 
 -- a blackjack simulator to measure effectiveness of tactics
 
@@ -130,5 +131,9 @@ play count bet = do
   return $ roundTakings + remainingTakings
   
 main = do
-  outcome <- play 10000 10
-  putStrLn $ show outcome
+  let iterations = 10000 :: Integer
+      bet = 10 :: Integer
+  takings <- play iterations bet :: IO Integer
+  let houseEdge = fromInteger (-1 * takings) / fromInteger (bet * iterations)
+      housePercentage = 100 * houseEdge
+  printf "After %d $%d hands, total money made was $%d (house made %s%%).\n" iterations bet takings (show housePercentage)
