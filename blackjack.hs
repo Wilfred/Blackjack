@@ -82,14 +82,13 @@ data Outcome = Loss | Push | Win | BlackjackWin deriving (Show, Eq)
 
 -- calculate the money made in this hand
 moneyMade :: Integer -> Outcome -> Integer
-moneyMade bet outcome
-  | outcome == Loss = -1 * bet
-  | outcome == Push = 0
-  | outcome == Win = bet
-  | outcome == BlackjackWin = ceiling $ 1.5 * fromIntegral bet
+moneyMade bet Loss = -1 * bet
+moneyMade bet Push = 0
+moneyMade bet Win = bet
+moneyMade bet BlackjackWin = ceiling $ 1.5 * fromIntegral bet
 
 playBlackjack :: Hand -> Hand -> Deck -> Outcome
-playBlackjack playerHand dealerHand (deck@card:cards)
+playBlackjack playerHand dealerHand (card:cards)
   -- player goes bust, house wins
   | playerScore == Bust = Loss
   -- player hits, give them another card
