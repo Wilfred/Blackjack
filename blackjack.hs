@@ -37,6 +37,10 @@ cardValues Eight = [8]
 cardValues Nine = [9]
 cardValues _ = [10]
 
+-- separate the first N cards in the deck from the rest of the deck
+dealCards :: Int -> Deck -> (Hand, Deck)
+dealCards number deck = (take number deck, drop number deck)
+
 -- blackjack is a hand of two cards, an ace and a ten/picture card
 handIsBlackjack :: Hand -> Bool
 handIsBlackjack [card1, card2] =
@@ -115,10 +119,9 @@ playRound :: IO Outcome
 playRound = do
   shuffledDeck <- shuffleDeck
   -- we don't deal cards in an alternating order, but it makes no difference
-  let playerHand = take 2 shuffledDeck
-      dealerHand = take 2 $ drop 2 shuffledDeck
-      remainingDeck = drop 4 shuffledDeck
-  return $ playBlackjack playerHand dealerHand remainingDeck
+  let (playerHand, remainingDeck) = dealCards 2 shuffledDeck
+      (dealerHand, remainingDeck') = dealCards 2 remainingDeck
+  return $ playBlackjack playerHand dealerHand remainingDeck'
 
 -- play a game N times and work out the overall takings/losses
 play :: Integer -> Money -> IO Money
