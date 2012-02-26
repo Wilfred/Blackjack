@@ -81,8 +81,11 @@ playerNextMove = dealerNextMove
 -- different, we use two wins
 data Outcome = Loss | Push | Win | BlackjackWin deriving (Show, Eq)
 
+-- a Las Vegas casino generally only deals with whole numbers of dollars
+type Money = Integer
+
 -- calculate the money made in this hand
-moneyMade :: Integer -> Outcome -> Integer
+moneyMade :: Money -> Outcome -> Money
 moneyMade bet Loss = -1 * bet
 moneyMade bet Push = 0
 moneyMade bet Win = bet
@@ -118,7 +121,7 @@ playRound = do
   return $ playBlackjack playerHand dealerHand remainingDeck
 
 -- play a game N times and work out the overall takings/losses
-play :: Integer -> Integer -> IO Integer
+play :: Integer -> Money -> IO Money
 play 0 bet = return 0
 play count bet = do
   -- get total for this round
@@ -132,8 +135,8 @@ play count bet = do
   
 main = do
   let iterations = 10000 :: Integer
-      bet = 10 :: Integer
-  takings <- play iterations bet :: IO Integer
+      bet = 10 :: Money
+  takings <- play iterations bet :: IO Money
   let houseEdge = fromInteger (-1 * takings) / fromInteger (bet * iterations)
       housePercentage = 100 * houseEdge
   printf "After %d $%d hands, total money made was $%d (house made %s%%).\n" iterations bet takings (show housePercentage)
