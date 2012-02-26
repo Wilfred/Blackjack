@@ -128,3 +128,7 @@ play count bet = do
   remainingTakings <- play (count - 1) bet
   
   return $ roundTakings + remainingTakings
+  
+main = do
+  outcome <- play 10000 10
+  putStrLn $ show outcome
