@@ -79,8 +79,13 @@ dealerNextMove hand
   where score = handScore hand
 
 -- very simple player for the time being
-playerNextMove playerHand dealerVisibleCard = dealerNextMove playerHand
-
+playerNextMove playerHand dealerVisibleCard
+  | playerScore > Value 16 = Stand
+  | playerScore > Value 12 && dealerScore < Value 7 = Stand
+  | otherwise = Hit
+  where playerScore = handScore playerHand
+        dealerScore = handScore [dealerVisibleCard]
+        
 -- since the money gained from winning with a blackjack hand is
 -- different, we use two wins
 data Outcome = Loss | Push | Win | BlackjackWin deriving (Show, Eq)
