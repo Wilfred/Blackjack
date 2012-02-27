@@ -79,7 +79,7 @@ dealerNextMove hand
   where score = handScore hand
 
 -- very simple player for the time being
-playerNextMove = dealerNextMove
+playerNextMove playerHand dealerVisibleCard = dealerNextMove playerHand
 
 -- since the money gained from winning with a blackjack hand is
 -- different, we use two wins
@@ -111,7 +111,8 @@ playBlackjack playerHand dealerHand (card:cards)
           Push else Loss
   where playerScore = handScore playerHand
         dealerScore = handScore dealerHand
-        playerMove = playerNextMove playerHand
+        dealerVisibleCard = dealerHand !! 0
+        playerMove = playerNextMove playerHand dealerVisibleCard
         dealerMove = dealerNextMove dealerHand
 
 -- play a game with the current strategy
