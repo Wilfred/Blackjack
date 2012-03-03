@@ -79,6 +79,7 @@ dealerNextMove hand
   where score = handScore hand
 
 -- very simple player for the time being
+playerNextMove :: Hand -> Card -> Move
 playerNextMove playerHand dealerVisibleCard
   | playerScore > Value 16 = Stand
   | playerScore > Value 12 && dealerScore < Value 7 = Stand
@@ -96,9 +97,9 @@ type Money = Integer
 
 -- calculate the money made in this hand
 moneyMade :: Money -> Outcome -> Money
-moneyMade bet Loss = -1 * bet
-moneyMade bet Push = 0
-moneyMade bet Win = bet
+moneyMade bet Loss         = -1 * bet
+moneyMade _ Push           = 0
+moneyMade bet Win          = bet
 moneyMade bet BlackjackWin = ceiling $ 1.5 * fromIntegral bet
 
 findOutcome :: Score Int -> Score Int -> Outcome
@@ -128,8 +129,6 @@ roundOutcome bet DealerPlaying playerHand dealerHand (card:cards)
   | dealerMove == Stand = (findOutcome playerScore dealerScore, bet)
   where playerScore = handScore playerHand
         dealerScore = handScore dealerHand
-        dealerVisibleCard = dealerHand !! 0
-        playerMove = playerNextMove playerHand dealerVisibleCard
         dealerMove = dealerNextMove dealerHand
         
 roundTakings :: Money -> Hand -> Hand -> Deck -> Money
@@ -148,15 +147,15 @@ playRound bet = do
 
 -- play a game N times and work out the overall takings/losses
 play :: Integer -> Money -> IO Money
-play 0 bet = return 0
+play 0 _ = return 0
 play count bet = do
   -- get total for this round
-  roundTakings <- playRound bet
+  takings <- playRound bet
       
   -- recursively add up other rounds
   remainingTakings <- play (count - 1) bet
   
-  return $ roundTakings + remainingTakings
+  return $ takings + remainingTakings
   
 main = do
   let iterations = 10000 :: Integer
