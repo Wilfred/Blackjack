@@ -98,6 +98,7 @@ moneyMade bet BlackjackWin = ceiling $ 1.5 * fromIntegral bet
 findOutcome :: Score Int -> Score Int -> Outcome
 findOutcome Bust _ = Loss
 findOutcome Blackjack _ = BlackjackWin
+findOutcome _ Bust = Win
 findOutcome playerScore dealerScore
   | playerScore > dealerScore = Win
   | playerScore == dealerScore = Push
