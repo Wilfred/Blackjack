@@ -95,6 +95,14 @@ moneyMade bet Push = 0
 moneyMade bet Win = bet
 moneyMade bet BlackjackWin = ceiling $ 1.5 * fromIntegral bet
 
+findOutcome :: Score Int -> Score Int -> Outcome
+findOutcome Bust _ = Loss
+findOutcome Blackjack _ = BlackjackWin
+findOutcome playerScore dealerScore
+  | playerScore > dealerScore = Win
+  | playerScore == dealerScore = Push
+  | otherwise = Loss
+
 playBlackjack :: Hand -> Hand -> Deck -> Outcome
 playBlackjack playerHand dealerHand (card:cards)
   -- player goes bust, house wins
@@ -105,10 +113,7 @@ playBlackjack playerHand dealerHand (card:cards)
   | playerMove == Stand = if
     dealerMove == Hit then
       playBlackjack playerHand (card:dealerHand) cards else
-      if dealerScore == Bust || dealerScore < playerScore then
-        Win else
-        if dealerScore == playerScore then
-          Push else Loss
+      findOutcome playerScore dealerScore
   where playerScore = handScore playerHand
         dealerScore = handScore dealerHand
         playerMove = playerNextMove playerHand
