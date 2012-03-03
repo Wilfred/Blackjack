@@ -67,8 +67,8 @@ handScore hand =
     if handIsBlackjack hand then Blackjack else Value (last notBustTotals)
   where notBustTotals = filter (<= 21) $ possibleHandTotals hand [0]
 
--- todo: DoubleDown, Split
-data Move = Hit | Stand deriving (Show, Eq)
+-- todo: Split
+data Move = Hit | Stand | DoubleDown deriving (Show, Eq)
 
 -- in Las Vegas, dealer hits on soft 17
 dealerNextMove :: Hand -> Move
@@ -82,6 +82,7 @@ dealerNextMove hand
 playerNextMove playerHand dealerVisibleCard
   | playerScore > Value 16 = Stand
   | playerScore > Value 12 && dealerScore < Value 7 = Stand
+  | playerScore == Value 11 || playerScore == Value 10 = DoubleDown
   | otherwise = Hit
   where playerScore = handScore playerHand
         dealerScore = handScore [dealerVisibleCard]
@@ -117,6 +118,7 @@ roundOutcome bet PlayerPlaying playerHand dealerHand (card:cards)
   | playerScore == Bust      = roundOutcome bet DealerPlaying playerHand dealerHand (card:cards)
   | playerMove == Stand      = roundOutcome bet DealerPlaying playerHand dealerHand (card:cards)
   | playerMove == Hit        = roundOutcome bet PlayerPlaying (card:playerHand) dealerHand cards
+  | playerMove == DoubleDown = roundOutcome (2 * bet) DealerPlaying (card:playerHand) dealerHand cards
   where playerScore = handScore playerHand
         playerMove = playerNextMove playerHand (head dealerHand)
                            
