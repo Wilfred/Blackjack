@@ -103,18 +103,21 @@ findOutcome playerScore dealerScore
   | playerScore > dealerScore = Win
   | playerScore == dealerScore = Push
   | otherwise = Loss
+                
+data GameState = PlayerPlaying | DealerPlaying
 
-playBlackjack :: Hand -> Hand -> Deck -> Outcome
-playBlackjack playerHand dealerHand (card:cards)
-  -- player goes bust, house wins
-  | playerScore == Bust = Loss
-  -- player hits, give them another card
-  | playerMove == Hit = playBlackjack (card:playerHand) dealerHand cards
-  -- player stands, dealer makes a decision
-  | playerMove == Stand = if
-    dealerMove == Hit then
-      playBlackjack playerHand (card:dealerHand) cards else
-      findOutcome playerScore dealerScore
+playBlackjack :: GameState -> Hand -> Hand -> Deck -> Outcome
+playBlackjack PlayerPlaying playerHand dealerHand (card:cards)
+  | playerScore == Bust = playBlackjack DealerPlaying playerHand dealerHand (card:cards)
+  | playerMove == Stand = playBlackjack DealerPlaying playerHand dealerHand (card:cards)
+  | playerMove == Hit   = playBlackjack PlayerPlaying (card:playerHand) dealerHand cards
+  where playerScore = handScore playerHand
+        playerMove = playerNextMove playerHand
+                           
+playBlackjack DealerPlaying playerHand dealerHand (card:cards)
+  | dealerScore == Bust = findOutcome playerScore dealerScore
+  | dealerMove == Hit   = playBlackjack DealerPlaying playerHand (card:dealerHand) cards
+  | dealerMove == Stand = findOutcome playerScore dealerScore
   where playerScore = handScore playerHand
         dealerScore = handScore dealerHand
         playerMove = playerNextMove playerHand
@@ -127,7 +130,8 @@ playRound = do
   -- we don't deal cards in an alternating order, but it makes no difference
   let (playerHand, remainingDeck) = dealCards 2 shuffledDeck
       (dealerHand, remainingDeck') = dealCards 2 remainingDeck
-  return $ playBlackjack playerHand dealerHand remainingDeck'
+      outcome = playBlackjack PlayerPlaying playerHand dealerHand remainingDeck'
+  return $ outcome
 
 -- play a game N times and work out the overall takings/losses
 play :: Integer -> Money -> IO Money
