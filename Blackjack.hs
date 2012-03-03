@@ -111,41 +111,45 @@ findOutcome playerScore dealerScore
                 
 data GameState = PlayerPlaying | DealerPlaying
 
-playBlackjack :: GameState -> Hand -> Hand -> Deck -> Outcome
-playBlackjack PlayerPlaying playerHand dealerHand (card:cards)
-  | playerScore == Bust = playBlackjack DealerPlaying playerHand dealerHand (card:cards)
-  | playerMove == Stand = playBlackjack DealerPlaying playerHand dealerHand (card:cards)
-  | playerMove == Hit   = playBlackjack PlayerPlaying (card:playerHand) dealerHand cards
+-- we pass the bet during the round too, since the bet can change
+roundOutcome :: Money -> GameState -> Hand -> Hand -> Deck -> (Outcome, Money)
+roundOutcome bet PlayerPlaying playerHand dealerHand (card:cards)
+  | playerScore == Bust      = roundOutcome bet DealerPlaying playerHand dealerHand (card:cards)
+  | playerMove == Stand      = roundOutcome bet DealerPlaying playerHand dealerHand (card:cards)
+  | playerMove == Hit        = roundOutcome bet PlayerPlaying (card:playerHand) dealerHand cards
   where playerScore = handScore playerHand
         playerMove = playerNextMove playerHand (head dealerHand)
                            
-playBlackjack DealerPlaying playerHand dealerHand (card:cards)
-  | dealerScore == Bust = findOutcome playerScore dealerScore
-  | dealerMove == Hit   = playBlackjack DealerPlaying playerHand (card:dealerHand) cards
-  | dealerMove == Stand = findOutcome playerScore dealerScore
+roundOutcome bet DealerPlaying playerHand dealerHand (card:cards)
+  | dealerScore == Bust = (findOutcome playerScore dealerScore, bet)
+  | dealerMove == Hit   = roundOutcome bet DealerPlaying playerHand (card:dealerHand) cards
+  | dealerMove == Stand = (findOutcome playerScore dealerScore, bet)
   where playerScore = handScore playerHand
         dealerScore = handScore dealerHand
         dealerVisibleCard = dealerHand !! 0
         playerMove = playerNextMove playerHand dealerVisibleCard
         dealerMove = dealerNextMove dealerHand
-
+        
+roundTakings :: Money -> Hand -> Hand -> Deck -> Money
+roundTakings bet playerHand dealerHand remainingDeck = moneyMade finalBet outcome
+  where (outcome, finalBet) = roundOutcome bet PlayerPlaying playerHand dealerHand remainingDeck
+      
 -- play a game with the current strategy
-playRound :: IO Outcome
-playRound = do
+playRound :: Money -> IO Money
+playRound bet = do
   shuffledDeck <- shuffleDeck
   -- we don't deal cards in an alternating order, but it makes no difference
   let (playerHand, remainingDeck) = dealCards 2 shuffledDeck
       (dealerHand, remainingDeck') = dealCards 2 remainingDeck
-      outcome = playBlackjack PlayerPlaying playerHand dealerHand remainingDeck'
-  return $ outcome
+      takings = roundTakings bet playerHand dealerHand remainingDeck'
+  return $ takings
 
 -- play a game N times and work out the overall takings/losses
 play :: Integer -> Money -> IO Money
 play 0 bet = return 0
 play count bet = do
   -- get total for this round
-  outcome <- playRound
-  let roundTakings = moneyMade bet outcome
+  roundTakings <- playRound bet
       
   -- recursively add up other rounds
   remainingTakings <- play (count - 1) bet
