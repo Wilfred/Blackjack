@@ -79,8 +79,13 @@ dealerNextMove hand
   where score = handScore hand
 
 -- very simple player for the time being
-playerNextMove = dealerNextMove
-
+playerNextMove playerHand dealerVisibleCard
+  | playerScore > Value 16 = Stand
+  | playerScore > Value 12 && dealerScore < Value 7 = Stand
+  | otherwise = Hit
+  where playerScore = handScore playerHand
+        dealerScore = handScore [dealerVisibleCard]
+        
 -- since the money gained from winning with a blackjack hand is
 -- different, we use two wins
 data Outcome = Loss | Push | Win | BlackjackWin deriving (Show, Eq)
@@ -112,7 +117,7 @@ playBlackjack PlayerPlaying playerHand dealerHand (card:cards)
   | playerMove == Stand = playBlackjack DealerPlaying playerHand dealerHand (card:cards)
   | playerMove == Hit   = playBlackjack PlayerPlaying (card:playerHand) dealerHand cards
   where playerScore = handScore playerHand
-        playerMove = playerNextMove playerHand
+        playerMove = playerNextMove playerHand (head dealerHand)
                            
 playBlackjack DealerPlaying playerHand dealerHand (card:cards)
   | dealerScore == Bust = findOutcome playerScore dealerScore
@@ -120,7 +125,8 @@ playBlackjack DealerPlaying playerHand dealerHand (card:cards)
   | dealerMove == Stand = findOutcome playerScore dealerScore
   where playerScore = handScore playerHand
         dealerScore = handScore dealerHand
-        playerMove = playerNextMove playerHand
+        dealerVisibleCard = dealerHand !! 0
+        playerMove = playerNextMove playerHand dealerVisibleCard
         dealerMove = dealerNextMove dealerHand
 
 -- play a game with the current strategy
