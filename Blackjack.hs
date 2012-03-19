@@ -26,16 +26,16 @@ shuffleDeck :: IO Deck
 shuffleDeck = shuffleCards [] fullDeck
 
 cardValues :: Card -> [Int]
-cardValues Ace = [1, 11]
-cardValues Two = [2]
+cardValues Ace   = [1, 11]
+cardValues Two   = [2]
 cardValues Three = [3]
-cardValues Four = [4]
-cardValues Five = [5]
-cardValues Six = [6]
+cardValues Four  = [4]
+cardValues Five  = [5]
+cardValues Six   = [6]
 cardValues Seven = [7]
 cardValues Eight = [8]
-cardValues Nine = [9]
-cardValues _ = [10]
+cardValues Nine  = [9]
+cardValues _     = [10]
 
 -- separate the first N cards in the deck from the rest of the deck
 dealCards :: Int -> Deck -> (Hand, Deck)
