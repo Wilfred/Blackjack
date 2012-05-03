@@ -164,4 +164,4 @@ main = do
   takings <- play iterations bet :: IO Money
   let houseEdge = fromInteger (-1 * takings) / fromInteger (bet * iterations)
       housePercentage = 100 * houseEdge
-  printf "After %d $%d hands, total money made was $%d (house made %s%%).\n" iterations bet takings (show housePercentage)
+  printf "After %d $%d hands, total money made was $%d (house made %.2f%%).\n" iterations bet takings (housePercentage :: Double)
