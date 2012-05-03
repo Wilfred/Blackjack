@@ -17,7 +17,7 @@ shouldn't use it).
 
     $ ghc Blackjack.hs
     $ ./Blackjack
-    After 1000 $10 hands, total money made was $180 (house made -1.7999999999999998%).
+    After 10000 $10 hands, total money made was $-2240 (house made 2.24%).
 
 
 
