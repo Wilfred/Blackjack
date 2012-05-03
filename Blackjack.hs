@@ -100,7 +100,7 @@ moneyMade :: Money -> Outcome -> Money
 moneyMade bet Loss         = -1 * bet
 moneyMade _ Push           = 0
 moneyMade bet Win          = bet
-moneyMade bet BlackjackWin = ceiling $ 1.5 * fromIntegral bet
+moneyMade bet BlackjackWin = ceiling $ (1.5 :: Double) * fromIntegral bet
 
 findOutcome :: Score Int -> Score Int -> Outcome
 findOutcome Bust _ = Loss
@@ -115,6 +115,7 @@ data GameState = PlayerPlaying | DealerPlaying
 
 -- we pass the bet during the round too, since the bet can change
 roundOutcome :: Money -> GameState -> Hand -> Hand -> Deck -> (Outcome, Money)
+roundOutcome _ _ _ _ [] = error "Deck is empty!"
 roundOutcome bet PlayerPlaying playerHand dealerHand (card:cards)
   | playerScore == Bust      = roundOutcome bet DealerPlaying playerHand dealerHand (card:cards)
   | playerMove == Stand      = roundOutcome bet DealerPlaying playerHand dealerHand (card:cards)
