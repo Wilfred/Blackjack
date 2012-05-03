@@ -98,7 +98,7 @@ type Money = Integer
 -- calculate the money made in this hand
 moneyMade :: Money -> Outcome -> Money
 moneyMade bet Loss         = -1 * bet
-moneyMade _ Push           = 0
+moneyMade _   Push         = 0
 moneyMade bet Win          = bet
 moneyMade bet BlackjackWin = ceiling $ (1.5 :: Double) * fromIntegral bet
 
@@ -163,5 +163,6 @@ main = do
       bet = 10 :: Money
   takings <- play iterations bet :: IO Money
   let houseEdge = fromInteger (-1 * takings) / fromInteger (bet * iterations)
-      housePercentage = 100 * houseEdge
-  printf "After %d $%d hands, total money made was $%d (house made %.2f%%).\n" iterations bet takings (housePercentage :: Double)
+      housePercentage = 100 * houseEdge :: Double
+  printf "After %d $%d hands, total money made was $%d (house made %.2f%%).\n"
+    iterations bet takings housePercentage
