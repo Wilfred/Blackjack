@@ -147,17 +147,17 @@ playRound bet = do
       takings = roundTakings bet playerHand dealerHand remainingDeck'
   return takings
 
--- play a game N times and work out the overall takings/losses
+-- play a game N times and work out the overall takings/losses for the
+-- given bet size
 play :: Integer -> Money -> IO Money
 play 0 _ = return 0
-play count bet = do
-  -- get total for this round
-  takings <- playRound bet
-      
-  -- recursively add up other rounds
-  remainingTakings <- play (count - 1) bet
-  
-  return $ takings + remainingTakings
+play count bet =
+  play' count bet 0
+  where
+    play' 0 _ accum = return accum
+    play' count' bet' accum = do
+      takings <- playRound bet'
+      play' (count' - 1) bet' (accum + takings)
   
 main = do
   let iterations = 10000 :: Integer
