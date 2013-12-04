@@ -44,8 +44,8 @@ dealCards number deck = (take number deck, drop number deck)
 -- blackjack is a hand of two cards, an ace and a ten/picture card
 handIsBlackjack :: Hand -> Bool
 handIsBlackjack [card1, card2] =
-  ((card1 == Ace) && (elem card2 [Ten, Jack, Queen, King])) ||
-  ((card2 == Ace) && (elem card1 [Ten, Jack, Queen, King]))
+  ((card1 == Ace) && elem card2 [Ten, Jack, Queen, King]) ||
+  ((card2 == Ace) && elem card1 [Ten, Jack, Queen, King])
 handIsBlackjack _ = False
 
 handIsSoft :: Hand -> Bool
@@ -62,9 +62,10 @@ possibleHandTotals (card:cards) runningTotals =
 data Score x = Value Int | Blackjack | Bust deriving (Show, Ord, Eq)
 
 handScore :: Hand -> Score Int
-handScore hand =
-  if notBustTotals == [] then Bust else
-    if handIsBlackjack hand then Blackjack else Value (last notBustTotals)
+handScore hand
+  | null notBustTotals = Bust
+  | handIsBlackjack hand = Blackjack
+  | otherwise = Value (last notBustTotals)
   where notBustTotals = filter (<= 21) $ possibleHandTotals hand [0]
 
 -- todo: Split
@@ -144,7 +145,7 @@ playRound bet = do
   let (playerHand, remainingDeck) = dealCards 2 shuffledDeck
       (dealerHand, remainingDeck') = dealCards 2 remainingDeck
       takings = roundTakings bet playerHand dealerHand remainingDeck'
-  return $ takings
+  return takings
 
 -- play a game N times and work out the overall takings/losses
 play :: Integer -> Money -> IO Money
